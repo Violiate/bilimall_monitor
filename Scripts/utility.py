@@ -2,7 +2,7 @@ import os
 import noneprompt,json
 
 def is_load_config():
-    if not os.path.exists("config.json"): return True
+    if not os.path.exists("config.json"): return False
     reload=noneprompt.ListPrompt(
         question="是否加载上次的配置？",
         choice=[
@@ -18,6 +18,8 @@ def load_config():
     if not os.path.exists("config.json"): return None
     with open("config.json") as f:
         return json.load(f)
+    
+
 
         
     

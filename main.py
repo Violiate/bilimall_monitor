@@ -13,30 +13,52 @@ if __name__ == '__main__':
         "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
         +str(random.randint(1,999))
     }
+    config={}
+    config["headers"]=headers
+    sale_status_translate={
+        
+        "11":"可销售",
+        "14":"有人下单，未付款",
+        "13":"已售罄"
+    }
     if not is_load_config():
-        config={}
+        
         config["item_id"]=noneprompt.InputPrompt(
             question="请输入商品id"
         ).prompt()
         config["sleep"]=noneprompt.InputPrompt(
             question="请输入每轮检测间隔时间(秒)，过快可能会触发风控",
-            default="60"
+            default_text="60"
         ).prompt()
-    config=load_config()
+        config["status"]={
+            "sale_status":"0",
+            "status":"0"
+        }
+    else:
+        config=load_config()
     bm_self=BM(config)
     while True:
-      response=bm_self.get_dynamic(config)
+      response=bm_self.get_dynamic()
       if not response==None:
         if "saleStatus" in response.json()["data"]:
             sale_status=response.json()["data"]["saleStatus"]
             status=response.json()["data"]["status"]
-            if "sale_status" and "status" in config["status"]:
-                if not sale_status!=config["status"]["sale_status"] and status==config["status"]["status"]:
+            
+            if sale_status!=config["status"]["sale_status"] or status!=config["status"]["status"]:
+                    config["status"]["sale_status"]=sale_status
+                    sale_status_name=sale_status
+                    config["status"]["status"]=status
+                    config["goods_name"]=response.json()["data"]["name"]
+                    if sale_status in sale_status_translate:
+                        sale_status_name=sale_status_translate[sale_status]
                     
-                    pass #not push
-            #push
-            config["status"]["sale_status"]=sale_status
-            config["status"]["status"]=status
+                    logger.success("商品 "+config["goods_name"]+" 状态发生变化 "+str(sale_status_name))
+                    bm_self.save_config(config)
+                    #push
+                    pass 
+        time.sleep(int(config["sleep"]))
+                
+                
 
 
         
