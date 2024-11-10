@@ -20,7 +20,7 @@ class BM:
             requests.exceptions.ReadTimeout,
             requests.exceptions.ConnectionError
             ) as e:
-            logger.error(" 服务器无响应")
+            logger.error("服务器无响应")
     
     def save_config(self,config):
        with open("config.json","w") as f:

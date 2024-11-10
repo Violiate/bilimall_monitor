@@ -34,6 +34,8 @@ if __name__ == '__main__':
             "sale_status":"0",
             "status":"0"
         }
+        push_config=push_choice()
+        
     else:
         config=load_config()
     bm_self=BM(config)
